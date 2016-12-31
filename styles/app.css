@@ -6,3 +6,8 @@ html, body {
 	padding: 0;
 	margin: 0;
 }
+
+canvas {
+	border: 1px solid #ccc;
+	width: calc(100% - 2px);
+}
