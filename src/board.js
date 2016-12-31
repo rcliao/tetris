@@ -1,37 +1,62 @@
-const BASE_BLOCK_WIDTH = 10
+const BASE_BLOCK_WIDTH = 30
+const WIDTH = 10
+const HEIGHT = 20
 
 class Board {
   constructor (x, y) {
     this.x = x
-      this.y = y
-      this.width = BASE_BLOCK_WIDTH * 10
-      this.height = BASE_BLOCK_WIDTH * 20
-      this.color = '#ccc'
-      this.activeBlock = new BaseBlock(this)
-      this.blocks = []
+    this.y = y
+    this.width = BASE_BLOCK_WIDTH * WIDTH 
+    this.height = BASE_BLOCK_WIDTH * HEIGHT
+    this.color = '#333'
+    this.activeBlock = new BaseBlock(this)
+    this.state = []
+    for (var i = 0; i < HEIGHT; i ++) {
+      this.state.push([])
+      for (var j = 0; j < WIDTH; j ++) {
+        this.state[i].push(new BaseBlock(this, j, i, 'empty'))
+      }
+    }
   }
 
   draw (ctx) {
-    ctx.fillStyle = this.color
-      ctx.strokeRect(this.x, this.y, this.width, this.height)
+    ctx.strokeStyle = this.color
+    ctx.strokeRect(this.x, this.y, this.width, this.height)
 
-      this.activeBlock.draw(ctx)
-      this.blocks.forEach(block => block.draw(ctx))
+    this.state.forEach(row => {
+      row.forEach(b => {
+        b.draw(ctx)
+      })
+    })
+    this.activeBlock.draw(ctx)
   }
 
   handleAction (keyPressed) {
-    if (this.activeBlock.y < this.height + this.y - BASE_BLOCK_WIDTH) {
+    if (!this.collide()) {
       Object.keys(keyPressed).forEach(key => {
         if (keyPressed[key]) {
-          this.activeBlock.move(key)
+          if (!(key === 'left' && this.activeBlock.x === 0 ||
+              key === 'right' && this.activeBlock.x === (WIDTH - 1))) {
+            this.activeBlock.move(key)
+          }
         }
         keyPressed[key] = false
       })
       this.activeBlock.move()
     } else {
-      this.blocks.push(this.activeBlock)
-        this.spawnNewBlock()
+      this.state[parseInt(this.activeBlock.y)][this.activeBlock.x] = this.activeBlock
+      this.spawnNewBlock()
     }
+  }
+
+  collide () {
+    let y = parseInt(this.activeBlock.y)
+    let x = this.activeBlock.x
+    return y >= (HEIGHT - 1) || 
+      (
+        this.state[y+1][x] &&
+        this.state[y+1][x].type === 'block'
+      )
   }
 
   spawnNewBlock () {
@@ -40,37 +65,41 @@ class Board {
 }
 
 class BaseBlock {
-  constructor(board) {
+  constructor(board, x = 4, y = 0, type = 'block') {
     this.board = board
-      this.x = board.x + 4 * BASE_BLOCK_WIDTH
-      this.y = board.y
-      this.width = BASE_BLOCK_WIDTH
-      this.height = BASE_BLOCK_WIDTH
-      this.color = '#f00'
+    this.x = x
+    this.y = y
+    this.width = BASE_BLOCK_WIDTH
+    this.height = BASE_BLOCK_WIDTH
+    this.type = type
+    this.color = this.type === 'empty' ? '#ccc' : '#f00'
   }
 
   move (action) {
-    console.log('moving block')
-      this.y++
-      switch (action) {
-        case 'left':
-          this.x -= BASE_BLOCK_WIDTH
-            break
-        case 'right':
-            this.x += BASE_BLOCK_WIDTH
-              break
-        case 'down':
-              this.y++
-                break
-        case 'up':
-                this.rotate()
-                  break
-      }
+    this.y+=0.05
+    switch (action) {
+      case 'left':
+        this.x--
+        break
+      case 'right':
+        this.x++
+        break
+      case 'down':
+        this.y+=0.1
+        break
+      case 'up':
+        this.rotate()
+        break
+    }
   }
 
   draw (ctx) {
+    let x = this.board.x + this.x * BASE_BLOCK_WIDTH
+    let y = this.board.y + this.y * BASE_BLOCK_WIDTH
     ctx.fillStyle = this.color
-      ctx.fillRect(this.x, this.y, this.width, this.height)
+    ctx.fillRect(x, y, this.width, this.height)
+    ctx.strokeStyle = '#eee'
+    ctx.strokeRect(x, y, this.width, this.height)
   }
 
   rotate () {
