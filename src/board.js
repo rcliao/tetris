@@ -48,6 +48,7 @@ class Board {
         this.activeBlock = newBlock
       }
     } else {
+      this.activeBlock.y = Math.floor(this.activeBlock.y)
       this.board[parseInt(this.activeBlock.y)][this.activeBlock.x] = this.activeBlock
       this.spawnNewBlock()
     }
@@ -63,7 +64,7 @@ class Board {
   }
 
   collide () {
-    let y = parseInt(this.activeBlock.y)
+    let y = Math.floor(this.activeBlock.y)
     let x = this.activeBlock.x
     return y >= (HEIGHT-1) || 
       (
@@ -86,11 +87,11 @@ class BaseBlock {
     this.height = BASE_BLOCK_WIDTH
     this.type = type
     this.color = this.type === 'empty' ? '#ccc' : '#f00'
+    this.velocity = 0.2
   }
 
   move (action) {
     let newBlock = Object.assign(Object.create(this), this)
-    newBlock.y++
     switch (action) {
       case 'left':
         newBlock.x--
@@ -99,11 +100,13 @@ class BaseBlock {
         newBlock.x++
         break
       case 'down':
-        newBlock.y++
+        newBlock.y+=this.velocity
         break
       case 'up':
         newBlock.rotate()
         break
+      default:
+        newBlock.y+=this.velocity
     }
     return newBlock
   }
