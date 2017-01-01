@@ -10,11 +10,12 @@ class Board {
     this.height = BASE_BLOCK_WIDTH * HEIGHT
     this.color = '#333'
     this.activeBlock = new BaseBlock(this)
-    this.state = []
+    this.board = []
+    // initialize starting board position based on the width and height
     for (var i = 0; i < HEIGHT; i ++) {
-      this.state.push([])
+      this.board.push([])
       for (var j = 0; j < WIDTH; j ++) {
-        this.state[i].push(new BaseBlock(this, j, i, 'empty'))
+        this.board[i].push(new BaseBlock(this, j, i, 'empty'))
       }
     }
   }
@@ -23,7 +24,7 @@ class Board {
     ctx.strokeStyle = this.color
     ctx.strokeRect(this.x, this.y, this.width, this.height)
 
-    this.state.forEach(row => {
+    this.board.forEach(row => {
       row.forEach(b => {
         b.draw(ctx)
       })
@@ -35,27 +36,39 @@ class Board {
     if (!this.collide()) {
       Object.keys(keyPressed).forEach(key => {
         if (keyPressed[key]) {
-          if (!(key === 'left' && this.activeBlock.x === 0 ||
-              key === 'right' && this.activeBlock.x === (WIDTH - 1))) {
-            this.activeBlock.move(key)
+          let newBlock = this.activeBlock.move(key)
+          if (this.isValid(newBlock)) {
+            this.activeBlock = newBlock
           }
         }
         keyPressed[key] = false
       })
-      this.activeBlock.move()
+      let newBlock = this.activeBlock.move()
+      if (this.isValid(newBlock)) {
+        this.activeBlock = newBlock
+      }
     } else {
-      this.state[parseInt(this.activeBlock.y)][this.activeBlock.x] = this.activeBlock
+      this.board[parseInt(this.activeBlock.y)][this.activeBlock.x] = this.activeBlock
       this.spawnNewBlock()
     }
+  }
+
+  isValid (block) {
+    let y = parseInt(block.y)
+    let x = block.x
+    return x >= 0 &&
+      x <= WIDTH - 1 &&
+      this.board[y][x].type === 'empty' &&
+      y < HEIGHT
   }
 
   collide () {
     let y = parseInt(this.activeBlock.y)
     let x = this.activeBlock.x
-    return y >= (HEIGHT - 1) || 
+    return y >= (HEIGHT-1) || 
       (
-        this.state[y+1][x] &&
-        this.state[y+1][x].type === 'block'
+        this.board[y+1][x] &&
+        this.board[y+1][x].type === 'block'
       )
   }
 
@@ -76,21 +89,23 @@ class BaseBlock {
   }
 
   move (action) {
-    this.y+=0.05
+    let newBlock = Object.assign(Object.create(this), this)
+    newBlock.y+=0.05
     switch (action) {
       case 'left':
-        this.x--
+        newBlock.x--
         break
       case 'right':
-        this.x++
+        newBlock.x++
         break
       case 'down':
-        this.y+=0.1
+        newBlock.y+=0.1
         break
       case 'up':
-        this.rotate()
+        newBlock.rotate()
         break
     }
+    return newBlock
   }
 
   draw (ctx) {
