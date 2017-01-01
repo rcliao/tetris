@@ -90,7 +90,7 @@ class BaseBlock {
 
   move (action) {
     let newBlock = Object.assign(Object.create(this), this)
-    newBlock.y+=0.05
+    newBlock.y++
     switch (action) {
       case 'left':
         newBlock.x--
@@ -99,7 +99,7 @@ class BaseBlock {
         newBlock.x++
         break
       case 'down':
-        newBlock.y+=0.1
+        newBlock.y++
         break
       case 'up':
         newBlock.rotate()
