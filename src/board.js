@@ -2,6 +2,16 @@ const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
 
+const SHAPES = {
+  'o': [[1, 1], [1, 1]],
+  'i': [[1, 1, 1, 1]],
+  's': [[0, 1], [1, 1], [1]],
+  'z': [[1], [1, 1], [0, 1]],
+  'l': [[1, 1, 1], [0, 0, 1]],
+  'j': [[0, 0, 1], [1, 1, 1]],
+  't': [[1, 0], [1, 1], [1]]
+}
+
 class Board {
   constructor (x, y) {
     this.x = x
@@ -9,7 +19,7 @@ class Board {
     this.width = BASE_BLOCK_WIDTH * WIDTH 
     this.height = BASE_BLOCK_WIDTH * HEIGHT
     this.color = '#333'
-    this.activeBlock = new BaseBlock(this)
+    this.activeBlock = new ComplexBlock(this, SHAPES['i'])
     this.board = []
     // initialize starting board position based on the width and height
     for (var i = 0; i < HEIGHT; i ++) {
@@ -33,24 +43,30 @@ class Board {
   }
 
   handleAction (keyPressed) {
-    if (!this.collide()) {
-      Object.keys(keyPressed).forEach(key => {
-        if (keyPressed[key]) {
-          let newBlock = this.activeBlock.move(key)
-          if (this.isValid(newBlock)) {
-            this.activeBlock = newBlock
-          }
+    // validate input (boundary)
+    Object.keys(keyPressed).forEach(key => {
+      if (keyPressed[key]) {
+        let newBlock = this.activeBlock.move(key)
+        if (newBlock.blocks.every(b => this.isValid(b))) {
+          this.activeBlock = newBlock
         }
         keyPressed[key] = false
+      }
+    })
+    // check if the current active block is colliding if so, spawn a new block
+    if (this.activeBlock.blocks.some(b => this.collide(b))) {
+      // collide
+      this.activeBlock.blocks.forEach(b => {
+        let y = Math.floor(b.y)
+        b.y = y
+        this.board[b.y][b.x] = b
       })
+      this.spawnNewBlock()
+    } else {
       let newBlock = this.activeBlock.move()
-      if (this.isValid(newBlock)) {
+      if (newBlock.blocks.every(b => this.isValid(b))) {
         this.activeBlock = newBlock
       }
-    } else {
-      this.activeBlock.y = Math.floor(this.activeBlock.y)
-      this.board[parseInt(this.activeBlock.y)][this.activeBlock.x] = this.activeBlock
-      this.spawnNewBlock()
     }
   }
 
@@ -63,10 +79,10 @@ class Board {
       y < HEIGHT
   }
 
-  collide () {
-    let y = Math.floor(this.activeBlock.y)
-    let x = this.activeBlock.x
-    return y >= (HEIGHT-1) || 
+  collide (block) {
+    let y = Math.floor(block.y)
+    let x = block.x
+    return y >= (HEIGHT - 1) || 
       (
         this.board[y+1][x] &&
         this.board[y+1][x].type === 'block'
@@ -74,7 +90,33 @@ class Board {
   }
 
   spawnNewBlock () {
-    this.activeBlock = new BaseBlock(this)
+    let shapes = Object.keys(SHAPES)
+    let randomShape = shapes[Math.floor(Math.random() * shapes.length)]
+    this.activeBlock = new ComplexBlock(this, SHAPES[randomShape])
+  }
+}
+
+class ComplexBlock {
+  constructor(board, shape, x = 4, y = 0) {
+    this.shape = shape
+    this.blocks = []
+    this.shape.forEach((row, i) => {
+      row.forEach((col, j)=> {
+        if (this.shape[i][j] === 1) {
+          this.blocks.push(new BaseBlock(board, x+i, y+j))
+        }
+      })
+    })
+  }
+
+  move (action) {
+    let newBlock = Object.assign(Object.create(this), this)
+    newBlock.blocks = newBlock.blocks.map(b => b.move(action))
+    return newBlock
+  }
+
+  draw (ctx) {
+    this.blocks.forEach(b => b.draw(ctx))
   }
 }
 
@@ -102,9 +144,6 @@ class BaseBlock {
       case 'down':
         newBlock.y+=this.velocity
         break
-      case 'up':
-        newBlock.rotate()
-        break
       default:
         newBlock.y+=this.velocity
     }
@@ -118,10 +157,6 @@ class BaseBlock {
     ctx.fillRect(x, y, this.width, this.height)
     ctx.strokeStyle = '#eee'
     ctx.strokeRect(x, y, this.width, this.height)
-  }
-
-  rotate () {
-    console.log('rotating')
   }
 }
 
