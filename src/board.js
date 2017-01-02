@@ -95,6 +95,26 @@ class Board {
         this.activeBlock = newBlock
       }
     }
+    this.clearLine()
+  }
+
+  clearLine () {
+    this.board.forEach((row, index) => {
+      if (row.every(b => b.type === 'block')) {
+        let emptyRow = []
+        for (var j = 0; j < WIDTH; j ++) {
+          emptyRow.push(new BaseBlock(this, j, 0, 'empty'))
+        }
+        for (var i = index; i > 0; i --) {
+          let rowAbove = this.board[i - 1]
+          rowAbove.forEach(b => {
+            b.y = b.y+1
+          })
+          this.board[i] = rowAbove
+        }
+        this.board[0] = emptyRow
+      }
+    })
   }
 
   isValid (block) {
