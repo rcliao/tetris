@@ -29,7 +29,7 @@ function main () {
         action = 'down'
         break
       case 75:
-        action = 'up'
+        action = 'rotate'
         break
       case 76:
         action = 'right'

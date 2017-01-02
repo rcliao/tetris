@@ -1,15 +1,42 @@
 const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
+const VELOCITY = 0.1
 
 const SHAPES = {
-  'o': [[1, 1], [1, 1]],
-  'i': [[1, 1, 1, 1]],
-  's': [[0, 1], [1, 1], [1]],
-  'z': [[1], [1, 1], [0, 1]],
-  'l': [[1, 1, 1], [0, 0, 1]],
-  'j': [[0, 0, 1], [1, 1, 1]],
-  't': [[1, 0], [1, 1], [1]]
+  'o': [
+    [[1, 1], [1, 1]]
+  ],
+  'i': [
+    [[1, 1, 1, 1]],
+    [[1], [1], [1], [1]]
+  ],
+  's': [
+    [[0, 1], [1, 1], [1]],
+    [[1, 1], [0, 1, 1]]
+  ],
+  'z': [
+    [[1], [1, 1], [0, 1]],
+    [[0, 1, 1], [1, 1]]
+  ],
+  'l': [
+    [[1, 1, 1], [0, 0, 1]],
+    [[1, 1], [1], [1]],
+    [[1], [1, 1, 1]],
+    [[0, 1], [0, 1], [1, 1]]
+  ],
+  'j': [
+    [[0, 0, 1], [1, 1, 1]],
+    [[1, 1], [0, 1], [0, 1]],
+    [[1, 1, 1], [1]],
+    [[1], [1], [1, 1]]
+  ],
+  't': [
+    [[1, 0], [1, 1], [1]],
+    [[0, 1], [1, 1, 1]],
+    [[0, 1], [1, 1], [0, 1]],
+    [[1, 1, 1], [0, 1]]
+  ]
 }
 
 class Board {
@@ -19,7 +46,6 @@ class Board {
     this.width = BASE_BLOCK_WIDTH * WIDTH 
     this.height = BASE_BLOCK_WIDTH * HEIGHT
     this.color = '#333'
-    this.activeBlock = new ComplexBlock(this, SHAPES['i'])
     this.board = []
     // initialize starting board position based on the width and height
     for (var i = 0; i < HEIGHT; i ++) {
@@ -28,6 +54,7 @@ class Board {
         this.board[i].push(new BaseBlock(this, j, i, 'empty'))
       }
     }
+    this.spawnNewBlock()
   }
 
   draw (ctx) {
@@ -57,7 +84,7 @@ class Board {
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
       // collide
       this.activeBlock.blocks.forEach(b => {
-        let y = Math.floor(b.y)
+        let y = Math.round(b.y)
         b.y = y
         this.board[b.y][b.x] = b
       })
@@ -92,17 +119,20 @@ class Board {
   spawnNewBlock () {
     let shapes = Object.keys(SHAPES)
     let randomShape = shapes[Math.floor(Math.random() * shapes.length)]
-    this.activeBlock = new ComplexBlock(this, SHAPES[randomShape])
+    this.activeBlock = new ComplexBlock(this, randomShape)
   }
 }
 
 class ComplexBlock {
-  constructor(board, shape, x = 4, y = 0) {
+  constructor(board, shape, shapeIndex = 0, x = 4, y = 0) {
+    this.board = board
     this.shape = shape
     this.blocks = []
-    this.shape.forEach((row, i) => {
+    this.shapeIndex = shapeIndex
+    let shapeMatrix = SHAPES[this.shape][shapeIndex]
+    shapeMatrix.forEach((row, i) => {
       row.forEach((col, j)=> {
-        if (this.shape[i][j] === 1) {
+        if (shapeMatrix[i][j] === 1) {
           this.blocks.push(new BaseBlock(board, x+i, y+j))
         }
       })
@@ -110,6 +140,16 @@ class ComplexBlock {
   }
 
   move (action) {
+    if (action === 'rotate') {
+      let x = this.blocks[0].x
+      let y = this.blocks[0].y
+      let shapeIndex = (this.shapeIndex === SHAPES[this.shape].length - 1) ?
+        0 : this.shapeIndex + 1
+      console.log(shapeIndex)
+      let newBlock = new ComplexBlock(this.board, this.shape, shapeIndex, x, y)
+      return newBlock
+    }
+
     let newBlock = Object.assign(Object.create(this), this)
     newBlock.blocks = newBlock.blocks.map(b => b.move(action))
     return newBlock
@@ -129,7 +169,7 @@ class BaseBlock {
     this.height = BASE_BLOCK_WIDTH
     this.type = type
     this.color = this.type === 'empty' ? '#ccc' : '#f00'
-    this.velocity = 0.2
+    this.velocity = VELOCITY
   }
 
   move (action) {
