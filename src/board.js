@@ -3,6 +3,15 @@ const WIDTH = 10
 const HEIGHT = 20
 const VELOCITY = 0.05
 
+const BLOCK_COLORS = {
+  'o': '#FBC02D',
+  'i': '#0097A7',
+  's': '#4CAF50',
+  'z': '#F44336',
+  'l': '#FF9800',
+  'j': '#2196F3',
+  't': '#9C27B0'
+}
 const SHAPES = {
   'o': [
     [[1, 1], [1, 1]]
@@ -101,7 +110,7 @@ class Board {
 
   clearLine () {
     this.board.forEach((row, index) => {
-      if (row.every(b => b.type === 'block')) {
+      if (row.every(b => b.type !== 'empty')) {
         let emptyRow = []
         for (var j = 0; j < WIDTH; j ++) {
           emptyRow.push(new BaseBlock(this, j, 0, 'empty'))
@@ -133,7 +142,7 @@ class Board {
     return y >= (HEIGHT - 1) || 
       (
         this.board[y+1][x] &&
-        this.board[y+1][x].type === 'block'
+        this.board[y+1][x].type !== 'empty'
       )
   }
 
@@ -154,7 +163,7 @@ class ComplexBlock {
     shapeMatrix.forEach((row, i) => {
       row.forEach((col, j)=> {
         if (shapeMatrix[i][j] === 1) {
-          this.blocks.push(new BaseBlock(board, x+i, y+j))
+          this.blocks.push(new BaseBlock(board, x+i, y+j, this.shape))
         }
       })
     })
@@ -195,7 +204,7 @@ class BaseBlock {
     this.width = BASE_BLOCK_WIDTH
     this.height = BASE_BLOCK_WIDTH
     this.type = type
-    this.color = this.type === 'empty' ? '#ccc' : '#f00'
+    this.color = this.type === 'empty' ? '#ccc' : BLOCK_COLORS[type]
     this.velocity = VELOCITY
   }
 
