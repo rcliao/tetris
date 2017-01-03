@@ -51,6 +51,8 @@ const SHAPES = {
 class Board {
   constructor (x, y) {
     this.score = 0
+    this.gameOver = false
+    this.tetris = false
     this.x = x
     this.y = y
     this.width = BASE_BLOCK_WIDTH * WIDTH 
@@ -70,6 +72,9 @@ class Board {
   draw (ctx) {
     ctx.strokeStyle = this.color
     ctx.strokeRect(this.x, this.y, this.width, this.height)
+    ctx.fillStyle = '#333'
+    ctx.font = '24px monospace'
+    ctx.fillText('Score: ' + this.score, this.x * 2 + this.width, this.y * 3)
 
     this.board.forEach(row => {
       row.forEach(b => {
@@ -80,6 +85,9 @@ class Board {
   }
 
   handleAction (keyPressed) {
+    if (this.gameOver) {
+      return
+    }
     // validate input (boundary)
     Object.keys(keyPressed).forEach(key => {
       if (keyPressed[key]) {
@@ -109,8 +117,10 @@ class Board {
   }
 
   clearLine () {
+    let lineCleared = 0
     this.board.forEach((row, index) => {
       if (row.every(b => b.type !== 'empty')) {
+        lineCleared ++
         let emptyRow = []
         for (var j = 0; j < WIDTH; j ++) {
           emptyRow.push(new BaseBlock(this, j, 0, 'empty'))
@@ -125,6 +135,14 @@ class Board {
         this.board[0] = emptyRow
       }
     })
+    if (lineCleared > 0) {
+      if (this.tetris && lineCleared === 4) {
+        // back to back tetris!
+        this.score += 400
+      }
+      this.tetris = lineCleared === 4
+      this.score += 100 * Math.pow(2, lineCleared - 1)
+    }
   }
 
   isValid (block) {
@@ -150,6 +168,9 @@ class Board {
     let shapes = Object.keys(SHAPES)
     let randomShape = shapes[Math.floor(Math.random() * shapes.length)]
     this.activeBlock = new ComplexBlock(this, randomShape)
+    if (this.activeBlock.blocks.some(b => this.collide(b))) {
+      this.gameOver = true
+    }
   }
 }
 

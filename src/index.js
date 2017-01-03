@@ -50,6 +50,10 @@ function main () {
         action = 'right'
         break
     }
+    if (action !== '') {
+      evt.preventDefault()
+      evt.stopPropagation()
+    }
     keyPressed[action] = true
   })
 
