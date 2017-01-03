@@ -20,9 +20,11 @@ function main () {
   
   // handle and translate keyboard into action
   document.addEventListener('keydown', evt => {
-    console.log(evt.which)
     let action = ''
     switch (evt.which) {
+      case 32:
+        action = 'drop'
+        break
       case 37:
         action = 'left'
         break

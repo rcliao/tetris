@@ -1,7 +1,7 @@
 const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
-const VELOCITY = 0.1
+const VELOCITY = 0.05
 
 const SHAPES = {
   'o': [
@@ -41,6 +41,7 @@ const SHAPES = {
 
 class Board {
   constructor (x, y) {
+    this.score = 0
     this.x = x
     this.y = y
     this.width = BASE_BLOCK_WIDTH * WIDTH 
@@ -165,8 +166,14 @@ class ComplexBlock {
       let y = this.blocks[0].y
       let shapeIndex = (this.shapeIndex === SHAPES[this.shape].length - 1) ?
         0 : this.shapeIndex + 1
-      console.log(shapeIndex)
       let newBlock = new ComplexBlock(this.board, this.shape, shapeIndex, x, y)
+      return newBlock
+    } else if (action === 'drop') {
+      let newBlock = this.move()
+      // TODO: probably find a better way to loop though this better later
+      while (!newBlock.blocks.some(b => this.board.collide(b))) {
+        newBlock = newBlock.move()
+      }
       return newBlock
     }
 
