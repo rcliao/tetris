@@ -74,8 +74,9 @@ class Board {
     ctx.strokeRect(this.x, this.y, this.width, this.height)
     ctx.fillStyle = '#333'
     ctx.font = '24px monospace'
-    ctx.fillText('Score: ' + this.score, this.x * 2 + this.width, this.y * 3)
-    ctx.fillText('Next: ', this.x * 2 + this.width, this.y * 5)
+    ctx.fillText('Score: ', this.x * 2 + this.width, this.y * 3)
+    ctx.fillText(this.score, this.x * 2 + this.width, this.y * 5)
+    ctx.fillText('Next: ', this.x * 2 + this.width, this.y * 7)
 
     this.board.forEach(row => {
       row.forEach(b => {
@@ -103,13 +104,17 @@ class Board {
     // check if the current active block is colliding if so, spawn a new block
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
       // collide
-      this.activeBlock.blocks.forEach(b => {
-        let y = Math.round(b.y)
-        b.y = y
-        this.board[b.y][b.x] = b
-      })
-      this.spawnNewBlock()
+      this.activeBlock.collideCounter ++
+      if (this.activeBlock.collideCounter >= 30) {
+        this.activeBlock.blocks.forEach(b => {
+          let y = Math.round(b.y)
+            b.y = y
+            this.board[b.y][b.x] = b
+        })
+        this.spawnNewBlock()
+      }
     } else {
+      this.activeBlock.collideCounter = 0
       let newBlock = this.activeBlock.move()
       if (newBlock.blocks.every(b => this.isValid(b))) {
         this.activeBlock = newBlock
@@ -177,7 +182,7 @@ class Board {
       this.activeBlock = new ComplexBlock(this, this.nextBlock.shape)
     }
     let x = this.x * 2 + this.width
-    let y = this.y * 6
+    let y = this.y * 8
     this.nextBlock = new ComplexBlock({x, y}, randomShape, 0, 1, 0)
 
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
@@ -192,6 +197,7 @@ class ComplexBlock {
     this.shape = shape
     this.blocks = []
     this.shapeIndex = shapeIndex
+    this.collideCounter = 0
     let shapeMatrix = SHAPES[this.shape][shapeIndex]
     shapeMatrix.forEach((row, i) => {
       row.forEach((col, j)=> {
@@ -216,6 +222,7 @@ class ComplexBlock {
       while (!newBlock.blocks.some(b => this.board.collide(b))) {
         newBlock = newBlock.move()
       }
+      newBlock.collideCounter = 30
       return newBlock
     }
 
@@ -251,7 +258,7 @@ class BaseBlock {
         newBlock.x++
         break
       case 'down':
-        newBlock.y+=this.velocity
+        newBlock.y+=this.velocity*5
         break
       default:
         newBlock.y+=this.velocity
