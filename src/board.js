@@ -51,6 +51,7 @@ const SHAPES = {
 class Board {
   constructor (x, y) {
     this.score = 0
+    this.lineCleared = 0
     this.gameOver = false
     this.tetris = false
     this.x = x
@@ -74,9 +75,12 @@ class Board {
     ctx.strokeRect(this.x, this.y, this.width, this.height)
     ctx.fillStyle = '#333'
     ctx.font = '24px monospace'
-    ctx.fillText('Score: ', this.x * 2 + this.width, this.y * 3)
-    ctx.fillText(this.score, this.x * 2 + this.width, this.y * 5)
-    ctx.fillText('Next: ', this.x * 2 + this.width, this.y * 7)
+    let rightX = this.x * 2 + this.width
+    ctx.fillText('Score: ', rightX, this.y * 3)
+    ctx.fillText(this.score, rightX, this.y * 5)
+    ctx.fillText('Lines:', rightX, this.y * 7)
+    ctx.fillText(this.lineCleared, rightX, this.y * 9)
+    ctx.fillText('Next: ', rightX, this.y * 11)
 
     this.board.forEach(row => {
       row.forEach(b => {
@@ -150,6 +154,7 @@ class Board {
       this.tetris = lineCleared === 4
       this.score += 100 * Math.pow(2, lineCleared - 1)
     }
+    this.lineCleared += lineCleared
   }
 
   isValid (block) {
@@ -182,7 +187,7 @@ class Board {
       this.activeBlock = new ComplexBlock(this, this.nextBlock.shape)
     }
     let x = this.x * 2 + this.width
-    let y = this.y * 8
+    let y = this.y * 12
     this.nextBlock = new ComplexBlock({x, y}, randomShape, 0, 1, 0)
 
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
