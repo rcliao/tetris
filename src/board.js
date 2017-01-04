@@ -75,12 +75,14 @@ class Board {
     ctx.fillStyle = '#333'
     ctx.font = '24px monospace'
     ctx.fillText('Score: ' + this.score, this.x * 2 + this.width, this.y * 3)
+    ctx.fillText('Next: ', this.x * 2 + this.width, this.y * 5)
 
     this.board.forEach(row => {
       row.forEach(b => {
         b.draw(ctx)
       })
     })
+    this.nextBlock.draw(ctx)
     this.activeBlock.draw(ctx)
   }
 
@@ -146,7 +148,7 @@ class Board {
   }
 
   isValid (block) {
-    let y = parseInt(block.y)
+    let y = Math.floor(block.y)
     let x = block.x
     return x >= 0 &&
       x <= WIDTH - 1 &&
@@ -167,7 +169,17 @@ class Board {
   spawnNewBlock () {
     let shapes = Object.keys(SHAPES)
     let randomShape = shapes[Math.floor(Math.random() * shapes.length)]
-    this.activeBlock = new ComplexBlock(this, randomShape)
+
+    if (!this.activeBlock) {
+      this.activeBlock = new ComplexBlock(this, randomShape)
+      randomShape = shapes[Math.floor(Math.random() * shapes.length)]
+    } else {
+      this.activeBlock = new ComplexBlock(this, this.nextBlock.shape)
+    }
+    let x = this.x * 2 + this.width
+    let y = this.y * 6
+    this.nextBlock = new ComplexBlock({x, y}, randomShape, 0, 1, 0)
+
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
       this.gameOver = true
     }
