@@ -137,8 +137,6 @@
 	var WIDTH = 10;
 	var HEIGHT = 20;
 	var COLLIDE_LIMIT = 30;
-	var level = 1;
-	var VELOCITY = 0.05 * level;
 
 	var BLOCK_COLORS = {
 	  'o': '#FBC02D',
@@ -167,8 +165,8 @@
 
 	    this.score = 0;
 	    this.lineCleared = 0;
-	    level = level;
-	    VELOCITY = 0.05 * level;
+	    this.level = level;
+	    this.velocity = 0.05 * this.level;
 	    this.gameOver = false;
 	    this.tetris = false;
 	    this.x = x;
@@ -195,11 +193,13 @@
 	      ctx.fillStyle = '#333';
 	      ctx.font = '24px monospace';
 	      var rightX = this.x * 2 + this.width;
-	      ctx.fillText('Score: ', rightX, this.y * 3);
-	      ctx.fillText(this.score, rightX, this.y * 5);
-	      ctx.fillText('Lines:', rightX, this.y * 7);
-	      ctx.fillText(this.lineCleared, rightX, this.y * 9);
-	      ctx.fillText('Next: ', rightX, this.y * 11);
+	      ctx.fillText('Level: ', rightX, this.y * 2);
+	      ctx.fillText(this.level, rightX, this.y * 3);
+	      ctx.fillText('Score: ', rightX, this.y * 5);
+	      ctx.fillText(this.score, rightX, this.y * 7);
+	      ctx.fillText('Lines:', rightX, this.y * 9);
+	      ctx.fillText(this.lineCleared, rightX, this.y * 11);
+	      ctx.fillText('Next: ', rightX, this.y * 13);
 
 	      this.board.forEach(function (row) {
 	        row.forEach(function (b) {
@@ -291,7 +291,8 @@
 	        this.score += 100 * Math.pow(2, lineCleared - 1);
 	      }
 	      this.lineCleared += lineCleared;
-	      this.level = Math.floor(lineCleared / 30);
+	      this.level += Math.floor(lineCleared / 30);
+	      this.velocity = 0.05 * this.level;
 	    }
 	  }, {
 	    key: 'isValid',
@@ -322,7 +323,7 @@
 	        this.activeBlock = new ComplexBlock(this, this.nextBlock.shape);
 	      }
 	      var x = this.x * 2 + this.width;
-	      var y = this.y * 12;
+	      var y = this.y * 14;
 	      this.nextBlock = new ComplexBlock({ x: x, y: y }, randomShape, 0, 1, 0);
 
 	      if (this.activeBlock.blocks.some(function (b) {
@@ -418,7 +419,6 @@
 	    this.height = BASE_BLOCK_WIDTH;
 	    this.type = type;
 	    this.color = this.type === 'empty' ? '#ccc' : BLOCK_COLORS[type];
-	    this.velocity = VELOCITY;
 	  }
 
 	  _createClass(BaseBlock, [{
@@ -433,10 +433,10 @@
 	          newBlock.x++;
 	          break;
 	        case 'down':
-	          newBlock.y += this.velocity + 0.2;
+	          newBlock.y += this.board.velocity + 0.2;
 	          break;
 	        default:
-	          newBlock.y += this.velocity;
+	          newBlock.y += this.board.velocity;
 	      }
 	      return newBlock;
 	    }

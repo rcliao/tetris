@@ -2,8 +2,6 @@ const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
 const COLLIDE_LIMIT = 30
-let level = 1
-let VELOCITY = 0.05 * level
 
 const BLOCK_COLORS = {
   'o': '#FBC02D',
@@ -54,8 +52,8 @@ class Board {
   constructor (x, y, level = 1) {
     this.score = 0
     this.lineCleared = 0
-    level = level
-    VELOCITY = 0.05 * level
+    this.level = level
+    this.velocity = 0.05 * this.level
     this.gameOver = false
     this.tetris = false
     this.x = x
@@ -80,11 +78,13 @@ class Board {
     ctx.fillStyle = '#333'
     ctx.font = '24px monospace'
     let rightX = this.x * 2 + this.width
-    ctx.fillText('Score: ', rightX, this.y * 3)
-    ctx.fillText(this.score, rightX, this.y * 5)
-    ctx.fillText('Lines:', rightX, this.y * 7)
-    ctx.fillText(this.lineCleared, rightX, this.y * 9)
-    ctx.fillText('Next: ', rightX, this.y * 11)
+    ctx.fillText('Level: ', rightX, this.y * 2)
+    ctx.fillText(this.level, rightX, this.y * 3)
+    ctx.fillText('Score: ', rightX, this.y * 5)
+    ctx.fillText(this.score, rightX, this.y * 7)
+    ctx.fillText('Lines:', rightX, this.y * 9)
+    ctx.fillText(this.lineCleared, rightX, this.y * 11)
+    ctx.fillText('Next: ', rightX, this.y * 13)
 
     this.board.forEach(row => {
       row.forEach(b => {
@@ -162,7 +162,8 @@ class Board {
       this.score += 100 * Math.pow(2, lineCleared - 1)
     }
     this.lineCleared += lineCleared
-    this.level = Math.floor(lineCleared / 30)
+    this.level += Math.floor(lineCleared / 30)
+    this.velocity = 0.05 * this.level
   }
 
   isValid (block) {
@@ -196,7 +197,7 @@ class Board {
       this.activeBlock = new ComplexBlock(this, this.nextBlock.shape)
     }
     let x = this.x * 2 + this.width
-    let y = this.y * 12
+    let y = this.y * 14
     this.nextBlock = new ComplexBlock({x, y}, randomShape, 0, 1, 0)
 
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
@@ -259,7 +260,6 @@ class BaseBlock {
     this.height = BASE_BLOCK_WIDTH
     this.type = type
     this.color = this.type === 'empty' ? '#ccc' : BLOCK_COLORS[type]
-    this.velocity = VELOCITY
   }
 
   move (action) {
@@ -272,10 +272,10 @@ class BaseBlock {
         newBlock.x++
         break
       case 'down':
-        newBlock.y+=this.velocity + 0.2
+        newBlock.y+=this.board.velocity + 0.2
         break
       default:
-        newBlock.y+=this.velocity
+        newBlock.y+=this.board.velocity
     }
     return newBlock
   }
