@@ -166,6 +166,7 @@
 
 	    this.score = 0;
 	    this.lineCleared = 0;
+	    this.startLevel = level;
 	    this.level = level;
 	    this.velocity = 0.05 * this.level;
 	    this.gameOver = false;
@@ -292,7 +293,7 @@
 	        this.score += 100 * Math.pow(2, lineCleared - 1);
 	      }
 	      this.lineCleared += lineCleared;
-	      this.level += Math.floor(this.lineCleared / LEVEL_UP_COUNTER);
+	      this.level = this.startLevel + Math.floor(this.lineCleared / LEVEL_UP_COUNTER);
 	      this.velocity = 0.05 * this.level;
 	    }
 	  }, {
