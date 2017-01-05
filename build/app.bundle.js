@@ -214,11 +214,13 @@
 	      // validate input (boundary)
 	      Object.keys(keyPressed).forEach(function (key) {
 	        if (keyPressed[key]) {
-	          var newBlock = _this.activeBlock.move(key);
-	          if (newBlock.blocks.every(function (b) {
-	            return _this.isValid(b);
-	          })) {
-	            _this.activeBlock = newBlock;
+	          if (!(_this.activeBlock.collideCounter > 0 && key === 'down')) {
+	            var newBlock = _this.activeBlock.move(key);
+	            if (newBlock.blocks.every(function (b) {
+	              return _this.isValid(b);
+	            })) {
+	              _this.activeBlock = newBlock;
+	            }
 	          }
 	          keyPressed[key] = false;
 	        }

@@ -98,9 +98,11 @@ class Board {
     // validate input (boundary)
     Object.keys(keyPressed).forEach(key => {
       if (keyPressed[key]) {
-        let newBlock = this.activeBlock.move(key)
-        if (newBlock.blocks.every(b => this.isValid(b))) {
-          this.activeBlock = newBlock
+        if (!(this.activeBlock.collideCounter > 0 && key === 'down')) {
+          let newBlock = this.activeBlock.move(key)
+          if (newBlock.blocks.every(b => this.isValid(b))) {
+            this.activeBlock = newBlock
+          }
         }
         keyPressed[key] = false
       }
