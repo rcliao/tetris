@@ -137,6 +137,7 @@
 	var WIDTH = 10;
 	var HEIGHT = 20;
 	var COLLIDE_LIMIT = 30;
+	var LEVEL_UP_COUNTER = 30;
 
 	var BLOCK_COLORS = {
 	  'o': '#FBC02D',
@@ -291,7 +292,7 @@
 	        this.score += 100 * Math.pow(2, lineCleared - 1);
 	      }
 	      this.lineCleared += lineCleared;
-	      this.level += Math.floor(lineCleared / 30);
+	      this.level += Math.floor(this.lineCleared / LEVEL_UP_COUNTER);
 	      this.velocity = 0.05 * this.level;
 	    }
 	  }, {

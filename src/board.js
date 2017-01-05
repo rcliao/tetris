@@ -2,6 +2,7 @@ const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
 const COLLIDE_LIMIT = 30
+const LEVEL_UP_COUNTER = 30
 
 const BLOCK_COLORS = {
   'o': '#FBC02D',
@@ -162,7 +163,7 @@ class Board {
       this.score += 100 * Math.pow(2, lineCleared - 1)
     }
     this.lineCleared += lineCleared
-    this.level += Math.floor(lineCleared / 30)
+    this.level += Math.floor(this.lineCleared / LEVEL_UP_COUNTER)
     this.velocity = 0.05 * this.level
   }
 
