@@ -2,6 +2,7 @@ const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
 const VELOCITY = 0.05
+const COLLIDE_LIMIT = 30
 
 const BLOCK_COLORS = {
   'o': '#FBC02D',
@@ -103,6 +104,8 @@ class Board {
           if (newBlock.blocks.every(b => this.isValid(b))) {
             this.activeBlock = newBlock
           }
+        } else {
+          this.activeBlock.collideCounter = COLLIDE_LIMIT
         }
         keyPressed[key] = false
       }
@@ -111,7 +114,7 @@ class Board {
     if (this.activeBlock.blocks.some(b => this.collide(b))) {
       // collide
       this.activeBlock.collideCounter ++
-      if (this.activeBlock.collideCounter >= 30) {
+      if (this.activeBlock.collideCounter >= COLLIDE_LIMIT) {
         this.activeBlock.blocks.forEach(b => {
           let y = Math.round(b.y)
             b.y = y
@@ -229,7 +232,7 @@ class ComplexBlock {
       while (!newBlock.blocks.some(b => this.board.collide(b))) {
         newBlock = newBlock.move()
       }
-      newBlock.collideCounter = 30
+      newBlock.collideCounter = COLLIDE_LIMIT
       return newBlock
     }
 
@@ -265,7 +268,7 @@ class BaseBlock {
         newBlock.x++
         break
       case 'down':
-        newBlock.y+=this.velocity*5
+        newBlock.y+=this.velocity + 0.2
         break
       default:
         newBlock.y+=this.velocity

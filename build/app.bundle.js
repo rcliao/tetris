@@ -137,6 +137,7 @@
 	var WIDTH = 10;
 	var HEIGHT = 20;
 	var VELOCITY = 0.05;
+	var COLLIDE_LIMIT = 30;
 
 	var BLOCK_COLORS = {
 	  'o': '#FBC02D',
@@ -221,6 +222,8 @@
 	            })) {
 	              _this.activeBlock = newBlock;
 	            }
+	          } else {
+	            _this.activeBlock.collideCounter = COLLIDE_LIMIT;
 	          }
 	          keyPressed[key] = false;
 	        }
@@ -231,7 +234,7 @@
 	      })) {
 	        // collide
 	        this.activeBlock.collideCounter++;
-	        if (this.activeBlock.collideCounter >= 30) {
+	        if (this.activeBlock.collideCounter >= COLLIDE_LIMIT) {
 	          this.activeBlock.blocks.forEach(function (b) {
 	            var y = Math.round(b.y);
 	            b.y = y;
@@ -373,7 +376,7 @@
 	        })) {
 	          _newBlock2 = _newBlock2.move();
 	        }
-	        _newBlock2.collideCounter = 30;
+	        _newBlock2.collideCounter = COLLIDE_LIMIT;
 	        return _newBlock2;
 	      }
 
@@ -425,7 +428,7 @@
 	          newBlock.x++;
 	          break;
 	        case 'down':
-	          newBlock.y += this.velocity * 5;
+	          newBlock.y += this.velocity + 0.2;
 	          break;
 	        default:
 	          newBlock.y += this.velocity;
