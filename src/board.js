@@ -1,8 +1,9 @@
 const BASE_BLOCK_WIDTH = 30
 const WIDTH = 10
 const HEIGHT = 20
-const VELOCITY = 0.05
 const COLLIDE_LIMIT = 30
+let level = 1
+let VELOCITY = 0.05 * level
 
 const BLOCK_COLORS = {
   'o': '#FBC02D',
@@ -52,7 +53,9 @@ const SHAPES = {
 class Board {
   constructor (x, y) {
     this.score = 0
-    this.lineCleared = 0
+    this.lineCleared = 150
+    level = Math.floor(this.lineCleared / 30)
+    VELOCITY = 0.05 * level
     this.gameOver = false
     this.tetris = false
     this.x = x
@@ -104,7 +107,7 @@ class Board {
           if (newBlock.blocks.every(b => this.isValid(b))) {
             this.activeBlock = newBlock
           }
-        } else {
+        } else if (key === 'down') {
           this.activeBlock.collideCounter = COLLIDE_LIMIT
         }
         keyPressed[key] = false
@@ -123,7 +126,6 @@ class Board {
         this.spawnNewBlock()
       }
     } else {
-      this.activeBlock.collideCounter = 0
       let newBlock = this.activeBlock.move()
       if (newBlock.blocks.every(b => this.isValid(b))) {
         this.activeBlock = newBlock
@@ -160,15 +162,17 @@ class Board {
       this.score += 100 * Math.pow(2, lineCleared - 1)
     }
     this.lineCleared += lineCleared
+    this.level = Math.floor(lineCleared / 30)
   }
 
   isValid (block) {
-    let y = Math.floor(block.y)
+    let y = Math.round(block.y)
     let x = block.x
     return x >= 0 &&
       x <= WIDTH - 1 &&
-      this.board[y][x].type === 'empty' &&
-      y < HEIGHT
+      y < HEIGHT &&
+      y >= 0 &&
+      this.board[y][x].type === 'empty'
   }
 
   collide (block) {

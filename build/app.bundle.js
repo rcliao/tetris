@@ -136,8 +136,9 @@
 	var BASE_BLOCK_WIDTH = 30;
 	var WIDTH = 10;
 	var HEIGHT = 20;
-	var VELOCITY = 0.05;
 	var COLLIDE_LIMIT = 30;
+	var level = 1;
+	var VELOCITY = 0.05 * level;
 
 	var BLOCK_COLORS = {
 	  'o': '#FBC02D',
@@ -163,7 +164,9 @@
 	    _classCallCheck(this, Board);
 
 	    this.score = 0;
-	    this.lineCleared = 0;
+	    this.lineCleared = 150;
+	    level = Math.floor(this.lineCleared / 30);
+	    VELOCITY = 0.05 * level;
 	    this.gameOver = false;
 	    this.tetris = false;
 	    this.x = x;
@@ -222,7 +225,7 @@
 	            })) {
 	              _this.activeBlock = newBlock;
 	            }
-	          } else {
+	          } else if (key === 'down') {
 	            _this.activeBlock.collideCounter = COLLIDE_LIMIT;
 	          }
 	          keyPressed[key] = false;
@@ -243,7 +246,6 @@
 	          this.spawnNewBlock();
 	        }
 	      } else {
-	        this.activeBlock.collideCounter = 0;
 	        var newBlock = this.activeBlock.move();
 	        if (newBlock.blocks.every(function (b) {
 	          return _this.isValid(b);
@@ -287,13 +289,14 @@
 	        this.score += 100 * Math.pow(2, lineCleared - 1);
 	      }
 	      this.lineCleared += lineCleared;
+	      this.level = Math.floor(lineCleared / 30);
 	    }
 	  }, {
 	    key: 'isValid',
 	    value: function isValid(block) {
-	      var y = Math.floor(block.y);
+	      var y = Math.round(block.y);
 	      var x = block.x;
-	      return x >= 0 && x <= WIDTH - 1 && this.board[y][x].type === 'empty' && y < HEIGHT;
+	      return x >= 0 && x <= WIDTH - 1 && y < HEIGHT && y >= 0 && this.board[y][x].type === 'empty';
 	    }
 	  }, {
 	    key: 'collide',
