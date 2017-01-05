@@ -161,11 +161,13 @@
 
 	var Board = function () {
 	  function Board(x, y) {
+	    var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
 	    _classCallCheck(this, Board);
 
 	    this.score = 0;
-	    this.lineCleared = 150;
-	    level = Math.floor(this.lineCleared / 30);
+	    this.lineCleared = 0;
+	    level = level;
 	    VELOCITY = 0.05 * level;
 	    this.gameOver = false;
 	    this.tetris = false;

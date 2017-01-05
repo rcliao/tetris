@@ -51,10 +51,10 @@ const SHAPES = {
 }
 
 class Board {
-  constructor (x, y) {
+  constructor (x, y, level = 1) {
     this.score = 0
-    this.lineCleared = 150
-    level = Math.floor(this.lineCleared / 30)
+    this.lineCleared = 0
+    level = level
     VELOCITY = 0.05 * level
     this.gameOver = false
     this.tetris = false
