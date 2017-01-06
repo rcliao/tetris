@@ -2,21 +2,40 @@
 
 import {Board, BaseBlock} from './board'
 
-// polyfill requestAnimationFrame method
+// unify requestAnimationFrame method for all vendors
 const vendors = ['webkit', 'moz'];
 for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
   window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
   window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
 }
+const canvas = document.querySelector('#main')
+const ctx = canvas.getContext('2d')
+const board = new Board(20, 20)
+board.draw(ctx, true)
 
-main()
+const startButton = document.querySelector('#start')
+const hostButton = document.querySelector('#host')
+const connectButton = document.querySelector('#connect')
+
+startButton.addEventListener('click', () => {
+  main()
+  startButton.disabled = true
+  hostButton.disabled = true
+  connectButton.disabled = true
+})
+
+hostButton.addEventListener('click', () => {
+  console.log('hosting')
+})
+
+connectButton.addEventListener('click', () => {
+  console.log('connecting')
+})
 
 function main () {
-  const canvas = document.querySelector('#main')
-  const ctx = canvas.getContext('2d')
   const keyPressed = {}
   
-  const board = new Board(20, 20)
+  board = new Board(20, 20)
   
   // handle and translate keyboard into action
   document.addEventListener('keydown', evt => {
@@ -60,9 +79,15 @@ function main () {
   gameLoop()
   
   function gameLoop () {
-    window.requestAnimationFrame(gameLoop)
-    board.handleAction(keyPressed)
-    draw(canvas, ctx, board)
+    if (!board.gameOver) {
+      window.requestAnimationFrame(gameLoop)
+      board.handleAction(keyPressed)
+      draw(canvas, ctx, board)
+    } else {
+      startButton.disabled = false
+      hostButton.disabled = false
+      connectButton.disabled = false
+    }
   }
 }
 

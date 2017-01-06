@@ -74,7 +74,7 @@ class Board {
     this.spawnNewBlock()
   }
 
-  draw (ctx) {
+  draw (ctx, initial = false) {
     ctx.strokeStyle = this.color
     ctx.strokeRect(this.x, this.y, this.width, this.height)
     ctx.fillStyle = '#333'
@@ -93,8 +93,10 @@ class Board {
         b.draw(ctx)
       })
     })
-    this.nextBlock.draw(ctx)
-    this.activeBlock.draw(ctx)
+    if (!initial) {
+      this.nextBlock.draw(ctx)
+      this.activeBlock.draw(ctx)
+    }
   }
 
   handleAction (keyPressed) {

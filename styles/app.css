@@ -21,3 +21,17 @@ canvas {
 	width: 35em;
 	margin: 1em auto;
 }
+
+button {
+	font-size: 16px;
+	padding: 0.5em 1em;
+	background-color: #03A9F4;
+	border: 1px solid #ccc;
+	color: #fff;
+	font-weight: 800;
+	font-family: monospace;
+}
+
+button[disabled] {
+	opacity: 0.5;
+}

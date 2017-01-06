@@ -48,21 +48,40 @@
 
 	var _board = __webpack_require__(1);
 
-	// polyfill requestAnimationFrame method
+	// unify requestAnimationFrame method for all vendors
 	var vendors = ['webkit', 'moz'];
 	for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 	  window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
 	  window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
 	}
+	var canvas = document.querySelector('#main');
+	var ctx = canvas.getContext('2d');
+	var board = new _board.Board(20, 20);
+	board.draw(ctx, true);
 
-	main();
+	var startButton = document.querySelector('#start');
+	var hostButton = document.querySelector('#host');
+	var connectButton = document.querySelector('#connect');
+
+	startButton.addEventListener('click', function () {
+	  main();
+	  startButton.disabled = true;
+	  hostButton.disabled = true;
+	  connectButton.disabled = true;
+	});
+
+	hostButton.addEventListener('click', function () {
+	  console.log('hosting');
+	});
+
+	connectButton.addEventListener('click', function () {
+	  console.log('connecting');
+	});
 
 	function main() {
-	  var canvas = document.querySelector('#main');
-	  var ctx = canvas.getContext('2d');
 	  var keyPressed = {};
 
-	  var board = new _board.Board(20, 20);
+	  board = new _board.Board(20, 20);
 
 	  // handle and translate keyboard into action
 	  document.addEventListener('keydown', function (evt) {
@@ -106,9 +125,15 @@
 	  gameLoop();
 
 	  function gameLoop() {
-	    window.requestAnimationFrame(gameLoop);
-	    board.handleAction(keyPressed);
-	    draw(canvas, ctx, board);
+	    if (!board.gameOver) {
+	      window.requestAnimationFrame(gameLoop);
+	      board.handleAction(keyPressed);
+	      draw(canvas, ctx, board);
+	    } else {
+	      startButton.disabled = false;
+	      hostButton.disabled = false;
+	      connectButton.disabled = false;
+	    }
 	  }
 	}
 
@@ -190,6 +215,8 @@
 	  _createClass(Board, [{
 	    key: 'draw',
 	    value: function draw(ctx) {
+	      var initial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
 	      ctx.strokeStyle = this.color;
 	      ctx.strokeRect(this.x, this.y, this.width, this.height);
 	      ctx.fillStyle = '#333';
@@ -208,8 +235,10 @@
 	          b.draw(ctx);
 	        });
 	      });
-	      this.nextBlock.draw(ctx);
-	      this.activeBlock.draw(ctx);
+	      if (!initial) {
+	        this.nextBlock.draw(ctx);
+	        this.activeBlock.draw(ctx);
+	      }
 	    }
 	  }, {
 	    key: 'handleAction',
