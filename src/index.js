@@ -1,5 +1,3 @@
-'use strict'
-
 import {Board, BaseBlock} from './board'
 
 // unify requestAnimationFrame method for all vendors
@@ -8,6 +6,7 @@ for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
   window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
   window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
 }
+
 const canvas = document.querySelector('#main')
 const ctx = canvas.getContext('2d')
 const board = new Board(20, 20)
