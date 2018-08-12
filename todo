@@ -1,0 +1,17 @@
+#1
+- [x] Design a socket client in JavaScript
+- [x] GUID random room id
+- [x] Private room messaging
+- [x] Message protocol
+- [ ] Implement showing two boards
+- [ ] Board new api to accept new piece rather than random peice
+
+#2
+- [ ] Mobile support
+- [ ] Validation??
+
+#Research
+- [ ] Plain JavaScript component without framework
+
+#Thoughts
+* There must be easier way to handle DOM manipulation

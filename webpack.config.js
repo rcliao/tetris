@@ -1,14 +1,17 @@
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/index.ts',
   output: {
-    path: './build',
-    filename: 'app.bundle.js'
+    filename: './app.bundle.js'
+  },
+  resolve: {
+    extensions: ['.ts']
   },
   module: {
-    loaders: [{
-      text: /\.js$/,
+    rules: [{
+      test: /\.ts$/,
       exclude: /node_modules/,
-      loader: 'babel-loader'
+      loader: 'ts-loader'
     }]
-  }
-};
+  },
+  devtool: 'inline-source-map'
+}
