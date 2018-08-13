@@ -1,4 +1,4 @@
-import {Board, BaseBlock} from "./board";
+import { Board } from "./board";
 
 const actionKeyMap: { [key: number]: string; } = {
     32: "drop",
@@ -18,14 +18,10 @@ let board = new Board(20, 20);
 board.draw(ctx, true);
 
 const startButton = <HTMLButtonElement> document.querySelector("#start");
-const hostButton = <HTMLButtonElement> document.querySelector("#host");
-const connectButton = <HTMLButtonElement> document.querySelector("#connect");
 
 startButton!.addEventListener("click", () => {
     main();
     startButton!.disabled = true;
-    hostButton!.disabled = true;
-    connectButton!.disabled = true;
 });
 
 function main () {
@@ -52,8 +48,6 @@ function main () {
             draw(canvas, ctx, board);
         } else {
             startButton.disabled = false;
-            hostButton.disabled = false;
-            connectButton.disabled = false;
         }
     }
 }
